@@ -57,7 +57,7 @@
 <br><br><br>
 ### Our Process
 
-- We focused on a feature lead design with a strict focus on TDD using Pytest. We made sure that we built each module was easily abstractable, and could be replaced easily (e.g. Rulesets, pieces etc.)
+- We focused on a feature lead design with a strict focus on TDD using Pytest. We made sure that we built each module so it was easily abstractable, and could be replaced easily (e.g. Rulesets, pieces etc.)
 - We worked in 2 day sprints, and paired on the more technically difficult parts of the script. Working on modular design with clear separate responsibilities for each team member meant that there were barely any merge conflicts throughout  
 
 - By the end of the second day we had arrived at our MVP:  
