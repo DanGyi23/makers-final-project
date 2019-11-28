@@ -20,7 +20,6 @@ class SlackControl:
     def check_for_start(self, web_client, data):
         if data.get('text', []) == 'start' and data.get('bot_id') == None and self.game == None:
             self.names_of_players = [data['user']]
-            print(self.channel)
             self.post(web_client, f" <@{data['user']}> wants to play! Enter join to start the game!")
 
     def check_for_join(self, web_client, data):
@@ -55,15 +54,11 @@ class SlackControl:
                 except:
                     self.post(web_client, 'Invalid move - try again')
                 self.__check_for_checkmate()
-                # self.post(web_client, self.slack_board_display.output_board(self.game))
                 self.slack_board_display.render_board(self.game, web_client, self.channel)
             if self.game.player_2.name == 'AI' and self.game.p1_turn == False:
                 self.__AI_move()
                 self.__check_for_checkmate()
-                # self.post(web_client, self.slack_board_display.output_board(self.game))
                 self.slack_board_display.render_board(self.game, web_client, self.channel)
-
-        # this could use some refactor - but needs to retain the AI move trigger after processing the player move
 
     def check_for_stop(self, web_client, data):
         if self.game != None and data.get('text', [])== 'stop' and data['user'] in self.names_of_players:
@@ -71,14 +66,12 @@ class SlackControl:
             self.game = None
             self.names_of_players = []
             self.game_mode = None
-            # maybe these 3 can all be set to None?
 
     def post(self, client, text):
         output = client.chat_postMessage(
             channel = self.channel,
             text = text,
             username = 'Chessy')
-            # as_user = True)
 
     # private methods
 
@@ -90,7 +83,6 @@ class SlackControl:
     def __launch_game(self, web_client, user_launched_game, names, ruleset = 'standard'):
         self.game = game.Game(names[0], names[1], ruleset)
         self.__announce_start(web_client, user_launched_game, names)
-        # self.post(web_client, self.slack_board_display.output_board(self.game))
         self.slack_board_display.render_board(self.game, web_client, self.channel)
 
     def __parse_and_execute_move(self, web_client, text):
@@ -99,19 +91,19 @@ class SlackControl:
         move = coordinate_conversion.Convert().coordinates(turn_from, turn_to)
         response = self.game.execute_turn(move[0],move[1],move[2],move[3])
         print(f"response {response}")
-        if response == 'invalid move':
-            self.post(web_client, 'Invalid move - try again')
-        if response == 'excommunication':
-            self.post(web_client, 'Oh no! bishops were excommunicated!')
-        if response == 'rooksale':
-            self.post(web_client, "Oh no! rooks were sold off! They can't move for 5 turns, while the transaction completes.")
-        if response == 'rooksign':
-            self.post(web_client, 'Sale complete! All Rooks can move again.')
-        if response == 'knight_honour':
-            self.post(web_client, 'Knights receive the hightest honour! They can now move in any direction, for 2 turns.')
-        if response == 'knight_normal':
-            self.post(web_client, 'The fun has worn off! Knights can no longer move in any direction')
-        # canb add more responses here
+        self.__post_response(web_client, response)
+
+    def __post_response(self, web_client, response):
+        response_mapping = {
+            'invalid move': 'Invalid move - try again',
+            'excommunication': 'Oh no! bishops were excommunicated!',
+            'rooksale': "Oh no! rooks were sold off! They can't move for 5 turns, while the transaction completes.",
+            'rooksign': 'Sale complete! All Rooks can move again.',
+            'knight_honour': 'Knights receive the hightest honour! They can now move in any direction, for 2 turns.',
+            'knight_normal': 'The fun has worn off! Knights can no longer move in any direction'
+            }
+        if response != 'valid move':
+            self.post(web_client, response_mapping.get(response, ''))
 
     def __AI_move(self):
         AI_move = minimax.Minimax(self.game).minimaxRoot(2, self.game.board, True)

@@ -15,6 +15,8 @@ class SlackBoardDisplay:
         )
         if self.__list_taken_pieces_ifany(game) != '\n': self.post(web_client, self.__list_taken_pieces_ifany(game), channel)
 
+    # output_board can be used to show a text-based board. use: self.post(web_client, self.slack_board_display.output_board(self.game))
+
     def output_board(self, game):
         output = self.__announce_whose_turn(game)
         output +='\n\n\n'

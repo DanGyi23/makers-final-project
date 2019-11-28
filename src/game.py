@@ -13,16 +13,8 @@ import turn
 class Game:
 
     def __init__(self, p1_name, p2_name, ruleset = "none"):
-
-        if ruleset == "many_queens":
-            self.ruleset = many_queens.ManyQueens()
-        elif ruleset == "random_pieces":
-            self.ruleset = random_pieces.RandomPieces()
-        elif ruleset == "ex_bishops":
-            self.ruleset = ExBishops()
-        else:
-            self.ruleset = standard_rules.StandardRules()
-
+        self.ruleset = None
+        self.__set_ruleset(ruleset)
         self.board = self.ruleset.starting_board
         self.player_1 = player.Player(p1_name, "White")
         self.player_2 = player.Player(p2_name, "Black")
@@ -35,18 +27,7 @@ class Game:
             response = turn.Turn(self.ruleset, self.board, self.log, self.player_1, self.player_2).move(int(turn_from_x), int(turn_from_y), int(turn_to_x), int(turn_to_y))
             self.log_turn(int(turn_from_x), int(turn_from_y), int(turn_to_x), int(turn_to_y))
             self.p1_turn = not self.p1_turn
-            if response == 'excommunication':
-                return 'excommunication'
-            elif response == 'rooksale':
-                return "rooksale"
-            elif response == 'rooksign':
-                return "rooksign"
-            elif response == 'knight_honour':
-                return 'knight_honour'
-            elif response == 'knight_normal':
-                return 'knight_normal'
-            else:
-                return 'valid move'
+            return self.__check_response_for_special_events(response)
         except:
             return 'invalid move'
 
@@ -80,3 +61,18 @@ class Game:
         colour = 'White' if self.p1_turn else 'Black'
         if self.board[x][y].colour != colour:
             raise ValueError("PlayerDoesNotOwnPiece")
+
+    def __check_response_for_special_events(self, response):
+        special_events = ['excommunication','rooksale','rooksign','knight_honour','knight_normal']
+        if response in special_events:
+            return response
+        else:
+            return 'valid move'
+
+    def __set_ruleset(self, ruleset):
+        ruleset_options = {
+            "many_queens": many_queens.ManyQueens(),
+            "random_pieces": random_pieces.RandomPieces(),
+            "ex_bishops": ExBishops()
+            }
+        self.ruleset = ruleset_options.get(ruleset, standard_rules.StandardRules())
