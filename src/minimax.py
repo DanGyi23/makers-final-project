@@ -10,8 +10,6 @@ class Minimax:
         def minimaxRoot(self, depth, board,isMaximizing):
                 possibleMoves = self.available_moves(board)
                 bestMove = -9999
-                secondBest = -9999
-                thirdBest = -9999
                 bestMoveFinal = None
                 for x in possibleMoves:
                         move = x
@@ -23,11 +21,6 @@ class Minimax:
                         except:
                                 value = max(bestMove, self.minimax(depth - 1, board, not isMaximizing))
                         if( value > bestMove):
-                                # print("Best score: " ,str(bestMove))
-                                # print("Best move: ",str(bestMoveFinal))
-                                # print("Second best: ", str(secondBest))
-                                thirdBest = secondBest
-                                secondBest = bestMove
                                 bestMove = value
                                 bestMoveFinal = move
                 return bestMoveFinal
